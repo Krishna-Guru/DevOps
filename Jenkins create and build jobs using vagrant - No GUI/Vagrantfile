@@ -1,0 +1,67 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.define "ubuntu-vm" do |vm1|
+  vm1.vm.hostname = "ubuntu-vm"
+  vm1.vm.box = "ubuntu/xenial64"
+  vm1.vm.network "private_network", ip: "192.168.33.10"
+  vm1.vm.provider "virtualbox" do |vb|
+    vb.name="ubuntu-vm"
+    vb.gui = false
+    vb.memory = "3024"
+
+  end
+
+
+  vm1.vm.provision "shell", run:"always", inline: <<-SHELL
+  sudo apt-get -y update
+  sudo apt-get -y install default-jdk
+
+  sudo apt-get -y install unzip
+  sudo wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-6.1.zip
+  sudo unzip sonarqube-6.1
+  cd sonarqube-6.1/bin/linux-x86-64
+  sudo ./sonar.sh start
+  cd ~
+
+  wget -q -O - https://pkg.jenkins.io/debian/jenkins-ci.org.key | sudo apt-key add -
+  echo deb https://pkg.jenkins.io/debian-stable binary/ | sudo tee /etc/apt/sources.list.d/jenkins.list
+  sudo apt-get -y update
+  sudo apt-get -y install jenkins
+  sudo mv /tmp/config.xml /var/lib/jenkins
+  cd /var/lib/jenkins
+  sudo systemctl restart jenkins
+  sleep 30
+  sudo wget http://192.168.33.10:8080/jnlpJars/jenkins-cli.jar
+  sudo java -jar jenkins-cli.jar -s http://192.168.33.10:8080/ install-plugin sonar
+  sudo java -jar jenkins-cli.jar -s http://192.168.33.10:8080/ install-plugin unleash
+  sudo java -jar jenkins-cli.jar -s http://192.168.33.10:8080/ install-plugin postbuild-task
+  sudo java -jar jenkins-cli.jar -s http://192.168.33.10:8080/ install-plugin github
+  sudo mv /tmp/hudson.tasks.Maven.xml /var/lib/jenkins/hudson.tasks.Maven.xml
+  sudo mv /tmp/hudson.plugins.sonar.SonarGlobalConfiguration.xml /var/lib/jenkins/hudson.plugins.sonar.SonarGlobalConfiguration.xml
+  sudo systemctl restart jenkins
+  sleep 30
+  sudo mv /tmp/createjob.xml /var/lib/jenkins
+  sudo java -jar jenkins-cli.jar -s http://192.168.33.10:8080/ create-job petclinic < createjob.xml
+  sudo java -jar jenkins-cli.jar -s http://192.168.33.10:8080/ build petclinic -s -v
+  wait
+  sudo mv /var/lib/jenkins/workspace/petclinic/target/spring-petclinic-2.1.0.BUILD-SNAPSHOT.jar /vagrant
+
+  SHELL
+  config.vm.provision "file",
+    source: "./config.xml",
+    destination: "/tmp/config.xml"
+  config.vm.provision "file",
+    source: "./createjob.xml",
+    destination: "/tmp/createjob.xml"
+  config.vm.provision "file",
+      source: "./hudson.tasks.Maven.xml",
+      destination: "/tmp/hudson.tasks.Maven.xml"
+  config.vm.provision "file",
+      source: "./hudson.plugins.sonar.SonarGlobalConfiguration.xml",
+      destination: "/tmp/hudson.plugins.sonar.SonarGlobalConfiguration.xml"
+
+end
+
+end
