@@ -1,9 +1,9 @@
 
 Note-
 
-1) This Assignment was executed in Windows 10 Education. Hence this installation procedure is written for Windows OS.
-2) This Assignment has been automated by implementing all the necessary instructions in vagrant file and hence running vagrant would install all the required software and create container image and also run it.
-3) If you encounter any errors during the automated execution, please follow the manual instructions.
+1) This task was executed in Windows 10 Education. Hence this installation procedure is written for Windows OS.
+2) This task has been automated by implementing all the necessary instructions in vagrant file and hence running vagrant would install all the required software and create container image and also run it.
+3) If you encounter any errors during the automated execution, please report as issues.
 4) IP Address of both containers are present in one of the screenshots, they are 172.17.0.2 and 172.17.0.3
 
 
