@@ -6,7 +6,7 @@ Note -
 ? Prior to performing these steps, it is assumed that the virtualbox is not currently installed in the system
 ? It is required that the system in which these scripts are being executed, has a steady internet connection
 ? For this exciting task, we use ubuntu - 19.04 Desktop amd 64 bit version as os and Virtualbox Version 6.08 (The download and installing of the software and setting up virtual machines and configuring them has been automated)
-? If there are conflicts/problems while installing through this method, please switch to manual mode of download and install
+? If there are conflicts/problems while installing through this method, please report as issues
 	
 
 Steps to achieve the goal - 
@@ -26,7 +26,7 @@ a. This script will create a new virtual machine and cloned virtual machine in t
 b. The virtual machines have been configured to use two Network adapters, one NAT - for internet connection and one Hostonly adapter for connection between VMs. The reason for preferring Hostonly over Bridged adapter is that Hostonly adapter can be more secure as it is involved with connection between VMs alone unlike Bridged adapter, which also connects to internet, thus making it potentially vulnerable
 c. The script will also automatically install the os in the virtual machine, without the need of any manual input
 10. Once the installation of OS is complete, press any key to continue in the command window, this will create the clone of virtual machine 1 and launch it.
-11. Once both the virtual machines are launched log in by selecting the user as ìdevops assignmentî and the password is DevopsA1
+11. Once both the virtual machines are launched log in by selecting the user as ‚Äúdevops assignment‚Äù and the password is DevopsA1
 12. After logging in, click the menu icon in the bottom left corner of the screen.
 13. In the search bar of menu, type terminal and double click on the search result
 14. In the terminal type su - , it will prompt for password,enter the password as DevopsA1. This is done to gain root access to the systems
