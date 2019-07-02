@@ -1,0 +1,13 @@
+---
+
+- name: run tasks on hosts
+  hosts: 192.168.33.10
+  tasks:
+    - name: Transfering petclinic.jar to host machine
+      copy:
+        src: /var/lib/jenkins/workspace/petclinic/target/spring-petclinic-2.1.0.BUILD-SNAPSHOT.jar
+        dest: /tmp
+
+
+    - name: Deploying petclinic.Jar on host
+      shell: cd /tmp; java -jar spring-petclinic-2.1.0.BUILD-SNAPSHOT.jar

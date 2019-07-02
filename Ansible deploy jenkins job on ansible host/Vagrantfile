@@ -1,0 +1,27 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.define "ubuntu-vm" do |vm1|
+  vm1.vm.hostname ="ubuntu-vm"
+  vm1.vm.box = "ubuntu/xenial64"
+  vm1.vm.network "private_network", ip: "192.168.33.10"
+    vm1.vm.provider "virtualbox" do |vb|
+    vb.name="ubuntu-vm"
+    vb.gui = false
+    vb.memory = "1024"
+  end
+
+  vm1.vm.provision "shell", run:"always", inline: <<-SHELL
+  sudo apt-get update
+  sudo apt-get -y install default-jdk
+  sudo apt-get -y install python
+  sudo mv /tmp/sshd_config /etc/ssh
+  sudo service ssh restart
+  SHELL
+  config.vm.provision "file",
+      source: "./sshd_config",
+      destination: "/tmp/sshd_config"
+  end
+
+end

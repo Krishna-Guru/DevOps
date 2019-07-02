@@ -1,0 +1,86 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.define "ubuntu-vm2" do |vm2|
+  vm2.vm.hostname = "ubuntu-vm2"
+  vm2.vm.box = "ubuntu/xenial64"
+  vm2.vm.network "private_network", ip: "192.168.33.20"
+  vm2.vm.provider "virtualbox" do |vb|
+    vb.name="ubuntu-vm2"
+    vb.gui = false
+    vb.memory = "3024"
+
+  end
+
+  vm2.vm.provision "shell", run:"always", inline: <<-SHELL
+  sudo apt-get -y update
+
+  sudo add-apt-repository ppa:openjdk-r/ppa
+  sudo apt-get update
+  sudo apt-get -y install openjdk-8-jdk
+  sudo apt-get -y install unzip
+  sudo wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-6.1.zip
+  sudo unzip sonarqube-6.1
+  cd sonarqube-6.1/bin/linux-x86-64
+  sudo ./sonar.sh start
+  cd ~
+
+  wget -q -O - https://pkg.jenkins.io/debian/jenkins-ci.org.key | sudo apt-key add -
+  echo deb https://pkg.jenkins.io/debian-stable binary/ | sudo tee /etc/apt/sources.list.d/jenkins.list
+  sudo apt-get -y update
+  sudo apt-get -y install jenkins
+  sudo mv /tmp/config.xml /var/lib/jenkins
+  cd /var/lib/jenkins
+  sudo systemctl restart jenkins
+  sleep 30
+  sudo wget http://192.168.33.20:8080/jnlpJars/jenkins-cli.jar
+  sudo java -jar jenkins-cli.jar -s http://192.168.33.20:8080/ install-plugin sonar
+  sudo java -jar jenkins-cli.jar -s http://192.168.33.20:8080/ install-plugin unleash
+  sudo java -jar jenkins-cli.jar -s http://192.168.33.20:8080/ install-plugin postbuild-task
+  sudo java -jar jenkins-cli.jar -s http://192.168.33.20:8080/ install-plugin github
+  sudo mv /tmp/hudson.tasks.Maven.xml /var/lib/jenkins/hudson.tasks.Maven.xml
+  sudo mv /tmp/hudson.plugins.sonar.SonarGlobalConfiguration.xml /var/lib/jenkins/hudson.plugins.sonar.SonarGlobalConfiguration.xml
+  sudo systemctl restart jenkins
+  sleep 30
+  sudo mv /tmp/createjob.xml /var/lib/jenkins
+  sudo java -jar jenkins-cli.jar -s http://192.168.33.20:8080/ create-job petclinic < createjob.xml
+  sudo java -jar jenkins-cli.jar -s http://192.168.33.20:8080/ build petclinic -s -v
+  wait
+  sudo mv /tmp/ssh_config /etc/ssh
+  sudo service ssh restart
+  sudo apt-get -y install python
+  sudo apt-get update
+  sudo apt-add-repository ppa:ansible/ansible
+  sudo apt-get -y install ansible
+  sudo apt -y install sshpass
+  ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa
+  sudo sshpass -p "vagrant" ssh-copy-id -i ~/.ssh/id_rsa.pub vagrant@192.168.33.10
+  sudo su
+  cd /etc/ansible
+  echo "192.168.33.10 ansible_ssh_pass=vagrant ansible_ssh_user=vagrant" >> hosts
+  cd /vagrant
+  ansible-playbook playbook.yml
+
+
+
+  SHELL
+  config.vm.provision "file",
+    source: "./config.xml",
+    destination: "/tmp/config.xml"
+  config.vm.provision "file",
+    source: "./createjob.xml",
+    destination: "/tmp/createjob.xml"
+  config.vm.provision "file",
+      source: "./hudson.tasks.Maven.xml",
+      destination: "/tmp/hudson.tasks.Maven.xml"
+  config.vm.provision "file",
+      source: "./hudson.plugins.sonar.SonarGlobalConfiguration.xml",
+      destination: "/tmp/hudson.plugins.sonar.SonarGlobalConfiguration.xml"
+  config.vm.provision "file",
+      source: "./ssh_config",
+      destination: "/tmp/ssh_config"
+
+end
+
+end
