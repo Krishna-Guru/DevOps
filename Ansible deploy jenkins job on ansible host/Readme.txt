@@ -1,9 +1,9 @@
 
 Note-
 
-1) This Assignment was executed in Windows 10 Education. Hence this installation procedure is written for Windows OS.
-2) This Assignment has been automated by implementing all the necessary instructions in vagrant file and hence running vagrant would set up an virtual machine that acts as ansible host and also will deploy petclinic.jar on ansible host
-3) If you encounter any errors during the automated execution, please follow the manual instructions.
+1) This task was executed in Windows 10 Education. Hence this installation procedure is written for Windows OS.
+2) This task has been automated by implementing all the necessary instructions in vagrant file and hence running vagrant would set up an virtual machine that acts as ansible host and also will deploy petclinic.jar on ansible host
+3) If you encounter any errors during the automated execution, please report as issues.
 
 Following software are needed in windows for execution of this assignment
 a) Vagrant
