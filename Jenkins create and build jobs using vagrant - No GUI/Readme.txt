@@ -3,7 +3,7 @@ Note-
 
 1) This task was executed in Windows 10 Education. Hence this installation procedure is written for Windows OS.
 2) This task has been automated by implementing all the necessary instructions in vagrant file and hence running vagrant would install all the required software and run sonar analysis on petclinic, build jar and launch it.
-3) If you encounter any errors during the automated execution, please follow the manual instructions.
+3) If you encounter any errors during the automated execution, please report as issues
 
 Following software are needed in windows for execution of this assignment
 a) Vagrant
