@@ -1,0 +1,69 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.define "ubuntu-vm" do |vm1|
+  vm1.vm.hostname = "ubuntu-vm"
+  vm1.vm.box = "ubuntu/xenial64"
+  vm1.vm.network "private_network", ip: "192.168.33.10"
+  vm1.vm.provider "virtualbox" do |vb|
+    vb.name="ubuntu-vm"
+    vb.gui = false
+    vb.memory = "1024"
+  end
+
+
+  vm1.vm.provision "shell", run:"always", inline: <<-SHELL
+  sudo apt-get update
+  sudo apt-get install apt-transport-https ca-certificates curl software-properties-common
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+  sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable"
+  sudo apt-get update
+  sudo apt-cache search docker-ce
+
+  sudo apt-get -y install docker-ce
+
+  sudo apt-get update
+
+  sudo apt-get install git-core
+
+   git clone https://github.com/spring-projects/spring-petclinic.git
+
+   sudo apt-get -y install default-jdk
+
+   sudo apt-get -y install software-properties-common
+   sudo apt-add-repository universe
+   sudo apt-get update
+   sudo apt-get -y install maven
+   cd spring-petclinic
+   ./mvnw package
+   cd /home/vagrant
+   sudo mv /tmp/Dockerfile.txt ./spring-petclinic/Dockerfile.txt
+   cd spring-petclinic
+   sudo docker build -f Dockerfile.txt -t docker-spring-boot .
+   sudo docker run -p 8080:8080 docker-spring-boot
+  SHELL
+  config.vm.provision "file",
+    source: "./Dockerfile.txt",
+    destination: "/tmp/Dockerfile.txt"
+
+end
+
+
+
+# config.vm.define "ubuntu-vm2" do |vm2|
+# vm2.vm.hostname ="ubuntu-vm2"
+# vm2.vm.box = "ubuntu/xenial64"
+# vm2.vm.network "private_network", ip: "192.168.33.20"
+#   vm2.vm.provider "virtualbox" do |vb|
+#   vb.name="ubuntu-vm2"
+#   vb.gui = false
+#   vb.memory = "1024"
+# end
+#
+# vm2.vm.provision "shell", run:"always", inline: <<-SHELL
+# echo "Hello from the Ubuntu VM2"
+# SHELL
+# end
+
+end
