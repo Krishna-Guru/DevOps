@@ -1,0 +1,18 @@
+---
+
+- name: run tasks on hosts
+  hosts: 192.168.33.20
+  become: true
+  gather_facts: no
+  tasks:
+    - name: Transfering encrypted ssh key
+      authorized_key: user=vagrant key="{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+
+    - name: Transfering petclinic.jar to host machine
+      copy:
+        src: /tmp/spring-petclinic-2.1.0.BUILD-SNAPSHOT.jar
+        dest: /tmp
+
+
+    - name: Deploying petclinic.Jar on host
+      shell: cd /tmp; java -jar spring-petclinic-2.1.0.BUILD-SNAPSHOT.jar
